@@ -464,6 +464,35 @@ mod tests {
         });
     }
 
+    #[bench]
+    fn bench_segment_intersection_skip_next(b: &mut Bencher) {
+        let searcher = INDEX.searcher();
+        let segment_reader = searcher.segment_reader(0);
+        b.iter(|| {
+            let segment_postings_a = segment_reader
+                .read_postings(&*TERM_A, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_b = segment_reader
+                .read_postings(&*TERM_B, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_c = segment_reader
+                .read_postings(&*TERM_C, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_d = segment_reader
+                .read_postings(&*TERM_D, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let mut intersection = IntersectionDocSet::from(vec![segment_postings_a,
+                                                                 segment_postings_b,
+                                                                 segment_postings_c,
+                                                                 segment_postings_d]);
+
+            let mut target = 0;
+            while intersection.skip_next(target) != SkipResult::End {
+                target += 10000;
+            }
+        });
+    }
+
     fn bench_skip_next(p: f32, b: &mut Bencher) {
         let searcher = INDEX.searcher();
         let segment_reader = searcher.segment_reader(0);

@@ -80,6 +80,29 @@ impl<TDocSet: DocSet> DocSet for IntersectionDocSet<TDocSet> {
         }
     }
 
+    fn skip_next(&mut self, target: DocId) -> SkipResult {
+        if self.finished {
+            return SkipResult::End;
+        }
+
+        for docset in &mut self.docsets {
+            match docset.skip_next(target) {
+                SkipResult::Reached => {}
+                SkipResult::OverStep => {
+                    self.doc = docset.doc();
+                    return SkipResult::OverStep;
+                }
+                SkipResult::End => {
+                    self.finished = true;
+                    return SkipResult::End;
+                }
+            }
+        }
+
+        self.doc = target;
+        SkipResult::Reached
+    }
+
     fn doc(&self) -> DocId {
         self.doc
     }
@@ -89,7 +112,7 @@ impl<TDocSet: DocSet> DocSet for IntersectionDocSet<TDocSet> {
 #[cfg(test)]
 mod tests {
 
-    use postings::{DocSet, VecPostings, IntersectionDocSet};
+    use postings::{DocSet, SkipResult, VecPostings, IntersectionDocSet};
 
     #[test]
     fn test_intersection() {
@@ -130,5 +153,26 @@ mod tests {
         let c = VecPostings::from(vec![3, 9]);
         let mut intersection = IntersectionDocSet::from(vec![a, b, c]);
         assert!(!intersection.advance());
+    }
+
+    #[test]
+    fn test_intersection_skip_next() {
+        let a = VecPostings::from(vec![1, 3, 7, 10, 12, 14, 20]);
+        let b = VecPostings::from(vec![1, 2, 3, 8, 10, 12, 14, 15, 20]);
+        let c = VecPostings::from(vec![1, 2, 3, 9, 10, 12, 14, 20]);
+        let mut intersection = IntersectionDocSet::from(vec![a, b, c]);
+        assert!(intersection.skip_next(1) == SkipResult::Reached);
+        assert_eq!(intersection.doc(), 1);
+        assert!(intersection.skip_next(2) == SkipResult::OverStep);
+        assert_eq!(intersection.doc(), 3);
+        assert!(intersection.skip_next(9) == SkipResult::OverStep);
+        assert_eq!(intersection.doc(), 10);
+        assert!(intersection.advance());
+        assert_eq!(intersection.doc(), 12);
+        assert!(intersection.skip_next(14) == SkipResult::Reached);
+        assert_eq!(intersection.doc(), 14);
+        assert!(intersection.skip_next(20) == SkipResult::Reached);
+        assert_eq!(intersection.doc(), 20);
+        assert!(intersection.skip_next(21) == SkipResult::End);
     }
 }
