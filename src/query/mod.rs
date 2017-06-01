@@ -6,6 +6,7 @@
 mod query;
 mod boolean_query;
 mod scorer;
+mod intersection_scorer;
 mod occur;
 mod weight;
 mod occur_filter;
@@ -22,5 +23,6 @@ pub use self::query_parser::QueryParser;
 pub use self::query::Query;
 pub use self::scorer::EmptyScorer;
 pub use self::scorer::Scorer;
+pub use self::intersection_scorer::IntersectionScorer;
 pub use self::term_query::TermQuery;
 pub use self::weight::Weight;
