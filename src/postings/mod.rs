@@ -12,6 +12,7 @@ mod term_info;
 mod vec_postings;
 mod segment_postings;
 mod intersection;
+mod union_all;
 mod freq_handler;
 mod docset;
 mod segment_postings_option;
@@ -28,6 +29,7 @@ pub use self::vec_postings::VecPostings;
 
 pub use self::segment_postings::{SegmentPostings, BlockSegmentPostings};
 pub use self::intersection::IntersectionDocSet;
+pub use self::union_all::UnionAllDocSet;
 pub use self::freq_handler::FreqHandler;
 pub use self::segment_postings_option::SegmentPostingsOption;
 pub use common::HasLen;
@@ -488,6 +490,35 @@ mod tests {
 
             let mut target = 0;
             while intersection.skip_next(target) != SkipResult::End {
+                target += 10000;
+            }
+        });
+    }
+
+    #[bench]
+    fn bench_segment_union_all_skip_next(b: &mut Bencher) {
+        let searcher = INDEX.searcher();
+        let segment_reader = searcher.segment_reader(0);
+        b.iter(|| {
+            let segment_postings_a = segment_reader
+                .read_postings(&*TERM_A, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_b = segment_reader
+                .read_postings(&*TERM_B, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_c = segment_reader
+                .read_postings(&*TERM_C, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let segment_postings_d = segment_reader
+                .read_postings(&*TERM_D, SegmentPostingsOption::NoFreq)
+                .unwrap();
+            let mut union = UnionAllDocSet::from(vec![segment_postings_a,
+                                                      segment_postings_b,
+                                                      segment_postings_c,
+                                                      segment_postings_d]);
+
+            let mut target = 0;
+            while union.skip_next(target) != SkipResult::End {
                 target += 10000;
             }
         });
