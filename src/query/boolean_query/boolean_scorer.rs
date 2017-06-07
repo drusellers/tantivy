@@ -41,28 +41,19 @@ pub struct BooleanScorer<TScorer: Scorer> {
 }
 
 impl<TScorer: Scorer> BooleanScorer<TScorer> {
-    pub fn new(scorers: Vec<TScorer>, occur_filter: OccurFilter) -> BooleanScorer<TScorer> {
+    pub fn new(mut scorers: Vec<TScorer>, occur_filter: OccurFilter) -> BooleanScorer<TScorer> {
         let score_combiner = ScoreCombiner::default_for_num_scorers(scorers.len());
-        let mut non_empty_scorers: Vec<TScorer> = Vec::new();
-        for mut posting in scorers {
-            let non_empty = posting.advance();
-            if non_empty {
-                non_empty_scorers.push(posting);
+        let mut heap_items = Vec::with_capacity(scorers.len());
+        for (ord, mut posting) in scorers.iter_mut().enumerate() {
+            if posting.advance() {
+                heap_items.push(HeapItem {
+                                    doc: posting.doc(),
+                                    ord: ord as u32,
+                                });
             }
         }
-        let heap_items: Vec<HeapItem> = non_empty_scorers
-            .iter()
-            .map(|posting| posting.doc())
-            .enumerate()
-            .map(|(ord, doc)| {
-                     HeapItem {
-                         doc: doc,
-                         ord: ord as u32,
-                     }
-                 })
-            .collect();
         BooleanScorer {
-            scorers: non_empty_scorers,
+            scorers: scorers,
             queue: BinaryHeap::from(heap_items),
             doc: 0u32,
             score_combiner: score_combiner,
