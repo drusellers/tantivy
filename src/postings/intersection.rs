@@ -175,5 +175,6 @@ mod tests {
         assert_eq!(intersection.doc(), 20);
         assert_eq!(intersection.skip_next(21), SkipResult::End);
         assert!(!intersection.advance());
+        assert_eq!(intersection.skip_next(22), SkipResult::End);
     }
 }
