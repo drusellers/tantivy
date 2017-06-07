@@ -2,7 +2,7 @@ use postings::DocSet;
 use postings::SkipResult;
 use DocId;
 
-/// Creates a `DocSet` that iterator through the intersection of two `DocSet`s.
+/// Creates a `DocSet` that iterates through the intersection of two or more `DocSet`s.
 pub struct IntersectionDocSet<TDocSet: DocSet> {
     docsets: Vec<TDocSet>,
     finished: bool,
@@ -161,18 +161,19 @@ mod tests {
         let b = VecPostings::from(vec![1, 2, 3, 8, 10, 12, 14, 15, 20]);
         let c = VecPostings::from(vec![1, 2, 3, 9, 10, 12, 14, 20]);
         let mut intersection = IntersectionDocSet::from(vec![a, b, c]);
-        assert!(intersection.skip_next(1) == SkipResult::Reached);
+        assert_eq!(intersection.skip_next(1), SkipResult::Reached);
         assert_eq!(intersection.doc(), 1);
-        assert!(intersection.skip_next(2) == SkipResult::OverStep);
+        assert_eq!(intersection.skip_next(2), SkipResult::OverStep);
         assert_eq!(intersection.doc(), 3);
-        assert!(intersection.skip_next(9) == SkipResult::OverStep);
+        assert_eq!(intersection.skip_next(9), SkipResult::OverStep);
         assert_eq!(intersection.doc(), 10);
         assert!(intersection.advance());
         assert_eq!(intersection.doc(), 12);
-        assert!(intersection.skip_next(14) == SkipResult::Reached);
+        assert_eq!(intersection.skip_next(14), SkipResult::Reached);
         assert_eq!(intersection.doc(), 14);
-        assert!(intersection.skip_next(20) == SkipResult::Reached);
+        assert_eq!(intersection.skip_next(20), SkipResult::Reached);
         assert_eq!(intersection.doc(), 20);
-        assert!(intersection.skip_next(21) == SkipResult::End);
+        assert_eq!(intersection.skip_next(21), SkipResult::End);
+        assert!(!intersection.advance());
     }
 }
