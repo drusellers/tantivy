@@ -115,3 +115,29 @@ impl<'a, TDocSet: DocSet> DocSet for &'a mut TDocSet {
         unref.size_hint()
     }
 }
+
+/// Represents a `DocSet` that wraps some `DocSet`s of the same type
+pub trait DocSetGroup<TDocSet: DocSet>: DocSet {
+    /// Returns a list with the underlying `DocSet`s
+    fn docsets(&self) -> &[TDocSet];
+}
+
+impl<TDocSetGroup, TDocSet> DocSetGroup<TDocSet> for Box<TDocSetGroup>
+    where TDocSetGroup: DocSetGroup<TDocSet> + ?Sized,
+          TDocSet: DocSet
+{
+    fn docsets(&self) -> &[TDocSet] {
+        let unboxed: &TDocSetGroup = self.borrow();
+        unboxed.docsets()
+    }
+}
+
+impl<'a, TDocSetGroup, TDocSet> DocSetGroup<TDocSet> for &'a mut TDocSetGroup
+    where TDocSetGroup: DocSetGroup<TDocSet>,
+          TDocSet: DocSet
+{
+    fn docsets(&self) -> &[TDocSet] {
+        let unref: &TDocSetGroup = *self;
+        unref.docsets()
+    }
+}

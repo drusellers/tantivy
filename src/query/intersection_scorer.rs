@@ -1,6 +1,6 @@
 use Score;
 use DocId;
-use postings::{DocSet, SkipResult, IntersectionDocSet};
+use postings::{DocSet, DocSetGroup, SkipResult, IntersectionDocSet};
 use query::Scorer;
 use query::boolean_query::ScoreCombiner;
 

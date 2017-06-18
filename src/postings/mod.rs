@@ -18,7 +18,7 @@ mod freq_handler;
 mod docset;
 mod segment_postings_option;
 
-pub use self::docset::{SkipResult, DocSet};
+pub use self::docset::{SkipResult, DocSet, DocSetGroup};
 use self::recorder::{Recorder, NothingRecorder, TermFrequencyRecorder, TFAndPositionRecorder};
 pub use self::serializer::PostingsSerializer;
 pub(crate) use self::postings_writer::MultiFieldPostingsWriter;

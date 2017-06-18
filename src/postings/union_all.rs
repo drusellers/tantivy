@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::mem;
-use postings::{DocSet, SkipResult};
+use postings::{DocSet, DocSetGroup, SkipResult};
 use DocId;
 
 /// Each `HeapItem` represents the head of
@@ -81,11 +81,10 @@ impl<TDocSet: DocSet> UnionAllDocSet<TDocSet> {
         // TODO: replace with PeekMut::pop one day
         self.queue.pop();
     }
+}
 
-    /// Returns an array to the underlying `DocSet`s of the union.
-    /// These `DocSet` are in the same position as the `UnionAllDocSet`,
-    /// so that user can access their `docfreq` and `positions`.
-    pub fn docsets(&self) -> &[TDocSet] {
+impl<TDocSet: DocSet> DocSetGroup<TDocSet> for UnionAllDocSet<TDocSet> {
+    fn docsets(&self) -> &[TDocSet] {
         &self.docsets[..]
     }
 }

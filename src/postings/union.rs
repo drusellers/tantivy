@@ -1,4 +1,4 @@
-use postings::{DocSet, SkipResult, UnionAllDocSet};
+use postings::{DocSet, DocSetGroup, SkipResult, UnionAllDocSet};
 use DocId;
 
 /// Creates a `DocSet` that iterates through the (distinct) union of two or more `DocSet`s.
@@ -17,11 +17,8 @@ impl<TDocSet: DocSet> From<Vec<TDocSet>> for UnionDocSet<TDocSet> {
     }
 }
 
-impl<TDocSet: DocSet> UnionDocSet<TDocSet> {
-    /// Returns an array to the underlying `DocSet`s of the union.
-    /// These `DocSet` are in the same position as the `UnionDocSet`,
-    /// so that user can access their `docfreq` and `positions`.
-    pub fn docsets(&self) -> &[TDocSet] {
+impl<TDocSet: DocSet> DocSetGroup<TDocSet> for UnionDocSet<TDocSet> {
+    fn docsets(&self) -> &[TDocSet] {
         self.inner.docsets()
     }
 }

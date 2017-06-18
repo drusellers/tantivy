@@ -1,8 +1,6 @@
+use postings::{DocSetGroup, SegmentPostings, Postings, IntersectionDocSet};
 use query::Scorer;
 use DocSet;
-use postings::SegmentPostings;
-use postings::Postings;
-use postings::IntersectionDocSet;
 use DocId;
 
 pub struct PhraseScorer<'a> {

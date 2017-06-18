@@ -1,27 +1,39 @@
+use std::marker::PhantomData;
 use Score;
 use DocId;
-use postings::{DocSet, DocSetGroup, SkipResult, UnionAllDocSet};
+use postings::{DocSet, DocSetGroup, SkipResult};
 use query::Scorer;
 use query::boolean_query::ScoreCombiner;
 
-/// Represents a `Scorer` for a union of `Scorer`s
-/// Keeps the duplicate elements
-pub struct UnionAllScorer<TScorer: Scorer> {
-    inner: UnionAllDocSet<TScorer>,
+/// Represents a `Scorer` for a collection of `Scorer`s
+pub struct GroupScorer<TDocSetGroup, TScorer>
+where
+    TDocSetGroup: DocSetGroup<TScorer>,
+    TScorer: Scorer,
+{
+    inner: TDocSetGroup,
     score_combiner: ScoreCombiner,
+    phantom: PhantomData<TScorer>,
 }
 
-impl<TScorer: Scorer> From<Vec<TScorer>> for UnionAllScorer<TScorer> {
-    fn from(scorers: Vec<TScorer>) -> UnionAllScorer<TScorer> {
+impl<TDocSetGroup, TScorer> From<Vec<TScorer>> for GroupScorer<TDocSetGroup, TScorer>
+    where TDocSetGroup: DocSetGroup<TScorer> + From<Vec<TScorer>>,
+          TScorer: Scorer
+{
+    fn from(scorers: Vec<TScorer>) -> GroupScorer<TDocSetGroup, TScorer> {
         let num_scorers = scorers.len();
-        UnionAllScorer {
-            inner: UnionAllDocSet::from(scorers),
+        GroupScorer {
+            inner: TDocSetGroup::from(scorers),
             score_combiner: ScoreCombiner::default_for_num_scorers(num_scorers),
+            phantom: PhantomData,
         }
     }
 }
 
-impl<TScorer: Scorer> DocSet for UnionAllScorer<TScorer> {
+impl<TDocSetGroup, TScorer> DocSet for GroupScorer<TDocSetGroup, TScorer>
+    where TDocSetGroup: DocSetGroup<TScorer>,
+          TScorer: Scorer
+{
     fn advance(&mut self) -> bool {
         if !self.inner.advance() {
             return false;
@@ -55,7 +67,10 @@ impl<TScorer: Scorer> DocSet for UnionAllScorer<TScorer> {
     }
 }
 
-impl<TScorer: Scorer> Scorer for UnionAllScorer<TScorer> {
+impl<TDocSetGroup, TScorer> Scorer for GroupScorer<TDocSetGroup, TScorer>
+    where TDocSetGroup: DocSetGroup<TScorer>,
+          TScorer: Scorer
+{
     fn score(&self) -> Score {
         self.score_combiner.score()
     }

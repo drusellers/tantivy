@@ -1,4 +1,4 @@
-use postings::DocSet;
+use postings::{DocSet, DocSetGroup};
 use postings::SkipResult;
 use DocId;
 
@@ -21,15 +21,11 @@ impl<TDocSet: DocSet> From<Vec<TDocSet>> for IntersectionDocSet<TDocSet> {
     }
 }
 
-impl<TDocSet: DocSet> IntersectionDocSet<TDocSet> {
-    /// Returns an array to the underlying `DocSet`s of the intersection.
-    /// These `DocSet` are in the same position as the `IntersectionDocSet`,
-    /// so that user can access their `docfreq` and `positions`.
-    pub fn docsets(&self) -> &[TDocSet] {
+impl<TDocSet: DocSet> DocSetGroup<TDocSet> for IntersectionDocSet<TDocSet> {
+    fn docsets(&self) -> &[TDocSet] {
         &self.docsets[..]
     }
 }
-
 
 impl<TDocSet: DocSet> DocSet for IntersectionDocSet<TDocSet> {
     fn size_hint(&self) -> usize {
