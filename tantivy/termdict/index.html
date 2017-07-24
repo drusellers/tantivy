@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `termdict` mod in crate `tantivy`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, termdict">
+
+    <title>tantivy::termdict - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc mod">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../tantivy/index.html'><img src='http://fulmicoton.com/tantivy-logo/tantivy-logo.png' alt='logo' width='100'></a>
+        <p class='location'>Module termdict</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../index.html'>tantivy</a></p><script>window.sidebarCurrent = {name: 'termdict', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>tantivy</a>::<wbr><a class="mod" href=''>termdict</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/tantivy/termdict/mod.rs.html#1-475' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>The term dictionary is one of the key datastructure of
+tantivy. It associates sorted <code>terms</code> to their respective
+posting list.</p>
+
+<p>The term dictionary makes it possible to iterate through
+the keys in a sorted manner.</p>
+
+<h1 id='example' class='section-header'><a href='#example'>Example</a></h1>
+<pre class="rust rust-example-rendered">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tantivy</span>;
+<span class="kw">use</span> <span class="ident">tantivy</span>::<span class="ident">termdict</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">tantivy</span>::<span class="ident">directory</span>::<span class="ident">ReadOnlySource</span>;
+
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">term_dictionary_builder</span> <span class="op">=</span> <span class="ident">TermDictionaryBuilderImpl</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>())<span class="question-mark">?</span>;
+
+<span class="comment">// keys have to be insert in order.</span>
+<span class="ident">term_dictionary_builder</span>.<span class="ident">insert</span>(<span class="string">&quot;apple&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1u32</span>)<span class="question-mark">?</span>;
+<span class="ident">term_dictionary_builder</span>.<span class="ident">insert</span>(<span class="string">&quot;grape&quot;</span>, <span class="kw-2">&amp;</span><span class="number">2u32</span>)<span class="question-mark">?</span>;
+<span class="ident">term_dictionary_builder</span>.<span class="ident">insert</span>(<span class="string">&quot;pear&quot;</span>, <span class="kw-2">&amp;</span><span class="number">3u32</span>)<span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="ident">buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">term_dictionary_builder</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
+
+<span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">ReadOnlySource</span>::<span class="ident">from</span>(<span class="ident">buffer</span>);
+<span class="kw">let</span> <span class="ident">term_dictionary</span> <span class="op">=</span> <span class="ident">TermDictionaryImpl</span>::<span class="ident">from_source</span>(<span class="ident">source</span>)<span class="question-mark">?</span>;
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">term_dictionary</span>.<span class="ident">get</span>(<span class="string">&quot;grape&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">2u32</span>));</pre>
+
+<h1 id='implementations-1' class='section-header'><a href='#implementations-1'>Implementations</a></h1>
+<p>There is currently two implementations of the term dictionary.</p>
+
+<h2 id='default-implementation--fstdict' class='section-header'><a href='#default-implementation--fstdict'>Default implementation : <code>fstdict</code></a></h2>
+<p>The default one relies heavily on the <code>fst</code> crate.
+It associate each terms <code>&amp;[u8]</code> representation to a <code>u64</code>
+that is in fact an address in a buffer. The value is then accessible
+via deserializing the value at this address.</p>
+
+<h2 id='stream-implementation--streamdict' class='section-header'><a href='#stream-implementation--streamdict'>Stream implementation : <code>streamdict</code></a></h2>
+<p>The <code>fstdict</code> is a tiny bit slow when streaming all of
+the terms.
+For some use case (analytics engine), it is preferrable
+to use the <code>streamdict</code>, that offers better streaming
+performance, to the detriment of <code>lookup</code> performance.</p>
+
+<p><code>streamdict</code> can be enabled by adding the <code>streamdict</code>
+feature when compiling <code>tantivy</code>.</p>
+
+<p><code>streamdict</code> encodes each term relatively to the precedent
+as follows.</p>
+
+<ul>
+<li>number of bytes that needs to be popped.</li>
+<li>number of bytes that needs to be added.</li>
+<li>sequence of bytes that is to be added</li>
+<li>value.</li>
+</ul>
+
+<p>Because such a structure does not allow for lookups,
+it comes with a <code>fst</code> that indexes 1 out of <code>1024</code>
+terms in this structure.</p>
+
+<p>A <code>lookup</code> therefore consists in a lookup in the <code>fst</code>
+followed by a streaming through at most <code>1024</code> elements in the
+term <code>stream</code>.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TermDictionaryBuilderImpl.html"
+                                  title='struct tantivy::termdict::TermDictionaryBuilderImpl'>TermDictionaryBuilderImpl</a></td>
+                           <td class='docblock-short'>
+                                <p>See <a href="./trait.TermDictionaryBuilder.html"><code>TermDictionaryBuilder</code></a></p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TermDictionaryImpl.html"
+                                  title='struct tantivy::termdict::TermDictionaryImpl'>TermDictionaryImpl</a></td>
+                           <td class='docblock-short'>
+                                <p>See <a href="./trait.TermDictionary.html"><code>TermDictionary</code></a></p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TermMerger.html"
+                                  title='struct tantivy::termdict::TermMerger'>TermMerger</a></td>
+                           <td class='docblock-short'>
+                                <p>Given a list of sorted term streams,
+returns an iterator over sorted unique terms.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TermStreamerBuilderImpl.html"
+                                  title='struct tantivy::termdict::TermStreamerBuilderImpl'>TermStreamerBuilderImpl</a></td>
+                           <td class='docblock-short'>
+                                <p>See <a href="./trait.TermStreamerBuilder.html"><code>TermStreamerBuilder</code></a></p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TermStreamerImpl.html"
+                                  title='struct tantivy::termdict::TermStreamerImpl'>TermStreamerImpl</a></td>
+                           <td class='docblock-short'>
+                                <p>See <a href="./trait.TermStreamer.html"><code>TermStreamer</code></a></p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.TermDictionary.html"
+                                  title='trait tantivy::termdict::TermDictionary'>TermDictionary</a></td>
+                           <td class='docblock-short'>
+                                <p>Dictionary associating sorted <code>&amp;[u8]</code> to values</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.TermDictionaryBuilder.html"
+                                  title='trait tantivy::termdict::TermDictionaryBuilder'>TermDictionaryBuilder</a></td>
+                           <td class='docblock-short'>
+                                <p>Builder for the new term dictionary.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.TermStreamer.html"
+                                  title='trait tantivy::termdict::TermStreamer'>TermStreamer</a></td>
+                           <td class='docblock-short'>
+                                <p><code>TermStreamer</code> acts as a cursor over a range of terms of a segment.
+Terms are guaranteed to be sorted.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.TermStreamerBuilder.html"
+                                  title='trait tantivy::termdict::TermStreamerBuilder'>TermStreamerBuilder</a></td>
+                           <td class='docblock-short'>
+                                <p><code>TermStreamerBuilder</code> is an helper object used to define
+a range of terms that should be streamed.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "tantivy";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

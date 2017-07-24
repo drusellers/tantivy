@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `BlockSegmentPostings` struct in crate `tantivy`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, BlockSegmentPostings">
+
+    <title>tantivy::postings::BlockSegmentPostings - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../tantivy/index.html'><img src='http://fulmicoton.com/tantivy-logo/tantivy-logo.png' alt='logo' width='100'></a>
+        <p class='location'>Struct BlockSegmentPostings</p><div class="block items"><ul><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='../index.html'>tantivy</a>::<wbr><a href='index.html'>postings</a></p><script>window.sidebarCurrent = {name: 'BlockSegmentPostings', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>tantivy</a>::<wbr><a href='index.html'>postings</a>::<wbr><a class="struct" href=''>BlockSegmentPostings</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/tantivy/postings/segment_postings.rs.html#191-199' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct BlockSegmentPostings&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p><code>BlockSegmentPostings</code> is a cursor iterating over blocks
+of documents.</p>
+
+<h1 id='warning' class='section-header'><a href='#warning'>Warning</a></h1>
+<p>While it is useful for some very specific high-performance
+use cases, you should prefer using <code>SegmentPostings</code> for most usage.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../../tantivy/postings/struct.BlockSegmentPostings.html" title="struct tantivy::postings::BlockSegmentPostings">BlockSegmentPostings</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/tantivy/postings/segment_postings.rs.html#201-311' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.doc_freq' class="method"><span id='doc_freq.v' class='invisible'><code>fn <a href='#method.doc_freq' class='fnname'>doc_freq</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h4>
+<div class='docblock'><p>Returns the document frequency associated to this block postings.</p>
+
+<p>This <code>doc_freq</code> is simply the sum of the length of all of the blocks
+length, and it does not take in account deleted documents.</p>
+</div><h4 id='method.docs' class="method"><span id='docs.v' class='invisible'><code>fn <a href='#method.docs' class='fnname'>docs</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;[</a><a class="type" href="../../tantivy/type.DocId.html" title="type tantivy::DocId">DocId</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span></h4>
+<div class='docblock'><p>Returns the array of docs in the current block.</p>
+
+<p>Before the first call to <code>.advance()</code>, the block
+returned by <code>.docs()</code> is empty.</p>
+</div><h4 id='method.freq_handler' class="method"><span id='freq_handler.v' class='invisible'><code>fn <a href='#method.freq_handler' class='fnname'>freq_handler</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../tantivy/postings/struct.FreqHandler.html" title="struct tantivy::postings::FreqHandler">FreqHandler</a></code></span></h4>
+<div class='docblock'><p>Returns a reference to the frequency handler.</p>
+</div><h4 id='method.advance' class="method"><span id='advance.v' class='invisible'><code>fn <a href='#method.advance' class='fnname'>advance</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>Advance to the next block.</p>
+
+<p>Returns false iff there was no remaining blocks.</p>
+</div><h4 id='method.empty' class="method"><span id='empty.v' class='invisible'><code>fn <a href='#method.empty' class='fnname'>empty</a>() -&gt; <a class="struct" href="../../tantivy/postings/struct.BlockSegmentPostings.html" title="struct tantivy::postings::BlockSegmentPostings">BlockSegmentPostings</a>&lt;'static&gt;</code></span></h4>
+<div class='docblock'><p>Returns an empty segment postings object</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a, 'b&gt; <a class="trait" href="../../fst/stream/trait.Streamer.html" title="trait fst::stream::Streamer">Streamer</a>&lt;'b&gt; for <a class="struct" href="../../tantivy/postings/struct.BlockSegmentPostings.html" title="struct tantivy::postings::BlockSegmentPostings">BlockSegmentPostings</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/tantivy/postings/segment_postings.rs.html#313-323' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Item' class="type"><span id='Item.t' class='invisible'><code>type <a href='../../fst/stream/trait.Streamer.html#associatedtype.Item' class="type">Item</a> = <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;'b [</a><a class="type" href="../../tantivy/type.DocId.html" title="type tantivy::DocId">DocId</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span></h4>
+<div class='docblock'><p>The type of the item emitted by this stream.</p>
+</div><h4 id='method.next' class="method"><span id='next.v' class='invisible'><code>fn <a href='../../fst/stream/trait.Streamer.html#tymethod.next' class='fnname'>next</a>(&amp;'b mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;'b [</a><a class="type" href="../../tantivy/type.DocId.html" title="type tantivy::DocId">DocId</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>&gt;</code></span></h4>
+<div class='docblock'><p>Emits the next element in this stream, or <code>None</code> to indicate the stream has been exhausted. <a href="../../fst/stream/trait.Streamer.html#tymethod.next">Read more</a></p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "tantivy";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Query` trait in crate `tantivy`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Query">
+
+    <title>tantivy::query::Query - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc trait">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../../tantivy/index.html'><img src='http://fulmicoton.com/tantivy-logo/tantivy-logo.png' alt='logo' width='100'></a>
+        <p class='location'>Trait Query</p><div class="block items"><ul><li><a href="#required-methods">Required Methods</a></li><li><a href="#provided-methods">Provided Methods</a></li><li><a href="#implementors">Implementors</a></li></ul></div><p class='location'><a href='../index.html'>tantivy</a>::<wbr><a href='index.html'>query</a></p><script>window.sidebarCurrent = {name: 'Query', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>tantivy</a>::<wbr><a href='index.html'>query</a>::<wbr><a class="trait" href=''>Query</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/tantivy/query/query.rs.html#41-82' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Query: <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> {
+    fn <a href='#tymethod.as_any' class='fnname'>as_any</a>(&amp;self) -&gt; &amp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.weight' class='fnname'>weight</a>(&amp;self, searcher: &amp;<a class="struct" href="../../tantivy/struct.Searcher.html" title="struct tantivy::Searcher">Searcher</a>) -&gt; <a class="type" href="../../tantivy/type.Result.html" title="type tantivy::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="trait" href="../../tantivy/query/trait.Weight.html" title="trait tantivy::query::Weight">Weight</a>&gt;&gt;;
+
+    fn <a href='#method.search' class='fnname'>search</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;searcher: &amp;<a class="struct" href="../../tantivy/struct.Searcher.html" title="struct tantivy::Searcher">Searcher</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;collector: &amp;mut <a class="trait" href="../../tantivy/collector/trait.Collector.html" title="trait tantivy::collector::Collector">Collector</a><br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="type" href="../../tantivy/type.Result.html" title="type tantivy::Result">Result</a>&lt;<a class="struct" href="../../tantivy/struct.TimerTree.html" title="struct tantivy::TimerTree">TimerTree</a>&gt; { ... }
+}</pre><div class='docblock'><p>Query trait are in charge of defining :</p>
+
+<ul>
+<li>a set of documents</li>
+<li>a way to score these documents</li>
+</ul>
+
+<p>When performing a <a href="#method.search">search</a>,  these documents will then
+be pushed to a <a href="../collector/trait.Collector.html">Collector</a>,
+which will in turn be in charge of deciding what to do with them.</p>
+
+<p>Concretely, this scored docset is represented by the
+<a href="./trait.Scorer.html"><code>Scorer</code></a> trait.</p>
+
+<p>Because our index is actually split into segments, the
+query does not actually directly creates <code>DocSet</code> object.
+Instead, the query creates a <a href="./trait.Weight.html"><code>Weight</code></a>
+object for a given searcher.</p>
+
+<p>The weight object, in turn, makes it possible to create
+a scorer for a specific <a href="../struct.SegmentReader.html"><code>SegmentReader</code></a>.</p>
+
+<p>So to sum it up :
+- a <code>Query</code> is recipe to define a set of documents as well the way to score them.
+- a <code>Weight</code> is this recipe tied to a specific <code>Searcher</code>. It may for instance
+hold statistics about the different term of the query. It is created by the query.
+- a <code>Scorer</code> is a cursor over the set of matching documents, for a specific
+<a href="../struct.SegmentReader.html"><code>SegmentReader</code></a>. It is created by the
+<a href="./trait.Weight.html"><code>Weight</code></a>.</p>
+
+<p>When implementing a new type of <code>Query</code>, it is normal to implement a
+dedicated <code>Query</code>, <code>Weight</code> and <code>Scorer</code>.</p>
+</div>
+            <h2 id='required-methods'>Required Methods</h2>
+            <div class='methods'>
+        <h3 id='tymethod.as_any' class='method'><span id='as_any.v' class='invisible'><code>fn <a href='#tymethod.as_any' class='fnname'>as_any</a>(&amp;self) -&gt; &amp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a></code></span></h3><div class='docblock'><p>Used to make it possible to cast Box<Query>
+into a specific type. This is mostly useful for unit tests.</p>
+</div><h3 id='tymethod.weight' class='method'><span id='weight.v' class='invisible'><code>fn <a href='#tymethod.weight' class='fnname'>weight</a>(&amp;self, searcher: &amp;<a class="struct" href="../../tantivy/struct.Searcher.html" title="struct tantivy::Searcher">Searcher</a>) -&gt; <a class="type" href="../../tantivy/type.Result.html" title="type tantivy::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="trait" href="../../tantivy/query/trait.Weight.html" title="trait tantivy::query::Weight">Weight</a>&gt;&gt;</code></span></h3><div class='docblock'><p>Create the weight associated to a query.</p>
+
+<p>See <a href="./trait.Weight.html"><code>Weight</code></a>.</p>
+</div></div>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.search' class='method'><span id='search.v' class='invisible'><code>fn <a href='#method.search' class='fnname'>search</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;searcher: &amp;<a class="struct" href="../../tantivy/struct.Searcher.html" title="struct tantivy::Searcher">Searcher</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;collector: &amp;mut <a class="trait" href="../../tantivy/collector/trait.Collector.html" title="trait tantivy::collector::Collector">Collector</a><br>) -&gt; <a class="type" href="../../tantivy/type.Result.html" title="type tantivy::Result">Result</a>&lt;<a class="struct" href="../../tantivy/struct.TimerTree.html" title="struct tantivy::TimerTree">TimerTree</a>&gt;</code></span></h3><div class='docblock'><p>Search works as follows :</p>
+
+<p>First the weight object associated to the query is created.</p>
+
+<p>Then, the query loops over the segments and for each segment :
+- setup the collector and informs it that the segment being processed has changed.
+- creates a <code>Scorer</code> object associated for this segment
+- iterate throw the matched documents and push them to the collector.</p>
+</div></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl Query for <a class="struct" href="../../tantivy/query/struct.BooleanQuery.html" title="struct tantivy::query::BooleanQuery">BooleanQuery</a></code></li>
+<li><code>impl Query for <a class="struct" href="../../tantivy/query/struct.TermQuery.html" title="struct tantivy::query::TermQuery">TermQuery</a></code></li>
+<li><code>impl Query for <a class="struct" href="../../tantivy/query/struct.PhraseQuery.html" title="struct tantivy::query::PhraseQuery">PhraseQuery</a></code></li>
+</ul><script type="text/javascript" async
+                         src="../../implementors/tantivy/query/trait.Query.js">
+                 </script></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "tantivy";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>
